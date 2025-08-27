@@ -1,0 +1,122 @@
+{% extends 'base.html.twig' %}
+
+
+
+{% block body %}
+    {% for flash_error in app.flashes('verify_email_error') %}
+        <div class="alert alert-danger" role="alert">{{ flash_error }}</div>
+    {% endfor %}
+    <h1>{% block title %}Registrar{% endblock %}</h1>
+
+    {{ form_errors(registrationForm) }}
+
+    {{ form_start(registrationForm, { 
+        'attr': { 'class': 'needs-validation text-start', 'novalidate': true } }) 
+    }}
+        
+        <div class="mb-3">
+            {{ form_label(registrationForm.nombre, 'Nombre', { 'label_attr': { 'class': 'form-label' } }) }}
+            {{ form_widget(registrationForm.nombre, { 
+                'attr': { 
+                    'class': 'form-control',
+                    'required': true
+                }
+            }) }}
+            <div class="invalid-feedback">
+                Por favor ingrese un nombre.
+            </div>
+            {{ form_errors(registrationForm.nombre) }}
+        </div>
+
+        <div class="mb-3">
+            {{ form_label(registrationForm.apellido, 'Apellido', { 'label_attr': { 'class': 'form-label' } }) }}
+            {{ form_widget(registrationForm.apellido, { 
+                'attr': { 
+                    'class': 'form-control',
+                    'required': true
+                }
+            }) }}
+            <div class="invalid-feedback">
+                Por favor ingrese un apellido.
+            </div>
+            {{ form_errors(registrationForm.apellido) }}
+        </div>
+
+        <div class="mb-3">
+            {{ form_label(registrationForm.username, 'Nombre de usuario', { 'label_attr': { 'class': 'form-label' } }) }}
+            {{ form_widget(registrationForm.username, { 
+                'attr': { 
+                    'class': 'form-control',
+                    'required': true
+                }
+            }) }}
+            <div class="invalid-feedback">
+                Por favor ingrese un nombre de usuario.
+            </div>
+            {{ form_errors(registrationForm.username) }}
+        </div>
+
+        <div class="mb-3">
+            {{ form_label(registrationForm.email, 'Correo electrónico', { 'label_attr': { 'class': 'form-label' } }) }}
+            {{ form_widget(registrationForm.email, { 
+                'attr': { 
+                    'class': 'form-control',
+                    'required': true
+                }
+            }) }}
+            <div class="invalid-feedback">
+                Por favor ingrese un correo electrónico válido.
+            </div>
+            {{ form_errors(registrationForm.email) }}
+        </div>
+
+        <div class="mb-3">
+            {{ form_label(registrationForm.plainPassword, 'Contraseña', { 'label_attr': { 'class': 'form-label' } }) }}
+            {{ form_widget(registrationForm.plainPassword, { 
+                'attr': { 
+                    'class': 'form-control',
+                    'required': true
+                }
+            }) }}
+            <div class="invalid-feedback">
+                Por favor ingrese una contraseña.
+            </div>
+            {{ form_errors(registrationForm.plainPassword) }}
+        </div>
+
+        <div class="mb-3">
+            {{ form_label(registrationForm.agreeTerms, 'Aceptar términos', { 'label_attr': { 'class': 'form-label' } }) }}
+            {{ form_widget(registrationForm.agreeTerms, {
+                'attr': {
+                    'class': 'form-check-input',
+                    'required': true
+                }
+            }) }}
+            <div class="invalid-feedback">
+                Por favor acepte los términos.
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Registrarse</button>
+    {{ form_end(registrationForm) }}
+<script>
+    // Example starter JavaScript for disabling form submissions if there are invalid fields
+(() => {
+  'use strict'
+
+  // Fetch all the forms we want to apply custom Bootstrap validation styles to
+  const forms = document.querySelectorAll('.needs-validation')
+
+  // Loop over them and prevent submission
+  Array.from(forms).forEach(form => {
+    form.addEventListener('submit', event => {
+      if (!form.checkValidity()) {
+        event.preventDefault()
+        event.stopPropagation()
+      }
+
+      form.classList.add('was-validated')
+    }, false)
+  })
+})()
+</script>
+{% endblock %}
