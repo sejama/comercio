@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UsuarioRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -56,6 +58,17 @@ class Usuario implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $lastConnection = null;
+
+    /**
+     * @var Collection<int, Negocio>
+     */
+    #[ORM\ManyToMany(targetEntity: Negocio::class, mappedBy: 'dresponsable')]
+    private Collection $negocios;
+
+    public function __construct()
+    {
+        $this->negocios = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -210,6 +223,33 @@ class Usuario implements UserInterface, PasswordAuthenticatedUserInterface
     public function setLastConnection(\DateTimeImmutable $lastConnection): static
     {
         $this->lastConnection = $lastConnection;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Negocio>
+     */
+    public function getNegocios(): Collection
+    {
+        return $this->negocios;
+    }
+
+    public function addNegocio(Negocio $negocio): static
+    {
+        if (!$this->negocios->contains($negocio)) {
+            $this->negocios->add($negocio);
+            $negocio->addDresponsable($this);
+        }
+
+        return $this;
+    }
+
+    public function removeNegocio(Negocio $negocio): static
+    {
+        if ($this->negocios->removeElement($negocio)) {
+            $negocio->removeDresponsable($this);
+        }
 
         return $this;
     }
