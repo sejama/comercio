@@ -1,9 +1,16 @@
-{% extends 'base.html.twig' %}
-
-{% block title %}Log in!{% endblock %}
-
-{% block body %}
-    <form method="post">
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Iniciar Sesión{% endblock %}</title>
+    {% block stylesheets %}
+        <link rel="stylesheet" href="{{ asset('assets/bootstrap-5.3.8-dist/css/bootstrap.min.css') }}" >
+    {% endblock %}
+</head>
+<body>
+    {% block body %}
+    <form method="post" class="form-signin w-25 m-auto mt-5">
         {% if error %}
             <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
         {% endif %}
@@ -15,25 +22,31 @@
         {% endif %}
 
         <h1 class="h3 mb-3 font-weight-normal">Por favor inicie sesión</h1>
-        
-        <label for="username">Nombre de usuario</label>
-        <input type="text" value="{{ last_username }}" name="_username" id="username" class="form-control" autocomplete="username" required autofocus>
-        <label for="password">Contraseña</label>
-        <input type="password" name="_password" id="password" class="form-control" autocomplete="current-password" required>
+        <div class="mb-3">
+            <label for="username">Nombre de usuario</label>
+            <input type="text" value="{{ last_username }}" name="_username" id="username" class="form-control" autocomplete="username" required autofocus>
+        </div>
+        <div class="mb-3">
+            <label for="password">Contraseña</label>
+            <input type="password" name="_password" id="password" class="form-control" autocomplete="current-password" required>
+            <div class="checkbox mb-3">
+                <input type="checkbox" name="_remember_me" id="_remember_me">
+                <label for="_remember_me">Recordarme</label>
+            </div>
+        </div>
         <input type="hidden" name="_csrf_token" data-controller="csrf-protection" value="{{ csrf_token('authenticate') }}">
 
         {#
             Uncomment this section and add a remember_me option below your firewall to activate remember me functionality.
             See https://symfony.com/doc/current/security/remember_me.html
         #}
-            <div class="checkbox mb-3">
-                <input type="checkbox" name="_remember_me" id="_remember_me">
-                <label for="_remember_me">Recordarme</label>
-            </div>
+            
         
 
         <button class="btn btn-lg btn-primary" type="submit">
             Iniciar sesión
         </button>
     </form>
-{% endblock %}
+    {% endblock %}
+</body>
+</html>
