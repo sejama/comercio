@@ -1,0 +1,36 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<h1>{% block title %}Mi Negocio{% endblock %}</h1>
+
+<p> Bienvenido, {{ app.user.userIdentifier }}. Este es su negocio.</p>
+<p> Puede actualizar su información comercial aquí.</p>
+{% for message in app.flashes('success') %}
+    <div class="alert alert-success" role="alert">
+        {{ message }}
+    </div>
+{% endfor %}
+{% for message in app.flashes('error') %}
+    <div class="alert alert-danger" role="alert">
+        {{ message }}
+    </div>
+{% endfor %}
+{% if negocios is not empty %}
+    {% for negocio in negocios %}
+        <h2>Información del Negocio</h2>
+        <strong>Nombre del Negocio:</strong> {{ negocio.nombre }}
+        {% if negocio.sucursales is not empty %}
+            <h3>Sucursales:</h3>
+                {% for sucursal in negocio.sucursales %}
+                    <strong>Sucursal: </strong> {{ sucursal.nombre }}
+                {% endfor %}
+        {% else %}
+            <p>No tiene sucursales registradas.</p>
+        {% endif %}
+    {% endfor %}
+{% else %}
+    <p>No tiene un negocio registrado. Por favor, cree uno.</p>
+    <a href="{{ path('app_negocio_create') }}" class="btn btn-primary">Crear Negocio</a>
+{% endif %}
+
+{% endblock %}

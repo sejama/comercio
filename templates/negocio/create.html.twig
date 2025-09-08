@@ -1,0 +1,170 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<h1>{% block title %}Mi Nuevo Negocio{% endblock %}</h1>
+
+{{ form_errors(negocioForm) }}
+
+{{ form_start(negocioForm, { 'attr': { 'class': 'needs-validation text-start', 'novalidate': true } }) }}
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            {{ form_label(negocioForm.nombre, 'Nombre', { 'label_attr': { 'class': 'form-label' } }) }}
+            {{ form_widget(negocioForm.nombre, { 
+                'attr': { 
+                'class': 'form-control',
+                'required': true
+            }
+            }) }}
+            <div class="invalid-feedback">
+                Por favor ingrese un nombre.
+            </div>
+            {{ form_errors(negocioForm.nombre) }}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            {{ form_label(negocioForm.sucursal.nombre, 'Nombre de la Sucursal', { 'label_attr': { 'class': 'form-label' } }) }}
+            {{ form_widget(negocioForm.sucursal.nombre, { 
+                'attr': { 
+                'class': 'form-control',
+                'required': true
+            }
+            }) }}
+            <div class="invalid-feedback">
+                Por favor ingrese un nombre para la sucursal.
+            </div>
+            {{ form_errors(negocioForm.sucursal.nombre) }}
+        </div>
+        <div class="col-md-6 mb-3">
+            {{ form_label(negocioForm.sucursal.domicilio, 'Domicilio', { 'label_attr': { 'class': 'form-label' } }) }}
+            {{ form_widget(negocioForm.sucursal.domicilio, { 
+                'attr': { 
+                'class': 'form-control',
+                'required': true
+            }
+            }) }}
+            <div class="invalid-feedback">
+                Por favor ingrese una domicilio.
+            </div>
+            {{ form_errors(negocioForm.sucursal.domicilio) }}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            {{ form_label(negocioForm.sucursal.sucursal_pais, 'País', { 'label_attr': { 'class': 'form-label' } }) }}
+            {{ form_widget(negocioForm.sucursal.sucursal_pais, { 
+                'attr': { 
+                'class': 'form-select',
+                'required': true
+            }
+            }) }}
+            <div class="invalid-feedback">
+                Por favor seleccione un país.
+            </div>
+            {{ form_errors(negocioForm.sucursal.sucursal_pais) }}
+        </div>
+        <div class="col-md-4 mb-3">
+            {{ form_label(negocioForm.sucursal.sucursal_provincia, 'Provincia', { 'label_attr': { 'class': 'form-label' } }) }}
+            {{ form_widget(negocioForm.sucursal.sucursal_provincia, { 
+                'attr': { 
+                'class': 'form-select',
+                'required': true
+            }
+            }) }}
+            <div class="invalid-feedback">
+                Por favor seleccione una provincia.
+            </div>
+            {{ form_errors(negocioForm.sucursal.sucursal_provincia) }}
+        </div>
+        <div class="col-md-4 mb-3">
+            {{ form_label(negocioForm.sucursal.localidad, 'Localidad', { 'label_attr': { 'class': 'form-label' } }) }}
+            {{ form_widget(negocioForm.sucursal.localidad, { 
+                'attr': { 
+                'class': 'form-select',
+                'required': true
+            }
+            }) }}
+            <div class="invalid-feedback">
+                Por favor seleccione una localidad.
+            </div>
+            {{ form_errors(negocioForm.sucursal.localidad) }}
+        </div>
+
+    </div>
+    <button type="submit" class="btn btn-primary">Crear</button>
+    {{ form_end(negocioForm) }}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+    const paisSelect = document.getElementById('negocio_sucursal_sucursal_pais');
+    const provinciaSelect = document.getElementById('negocio_sucursal_sucursal_provincia');
+    const localidadSelect = document.getElementById('negocio_sucursal_localidad');
+
+    // Deshabilitar provincia y localidad al inicio
+    if (provinciaSelect) {
+        provinciaSelect.disabled = true;
+    }
+    if (localidadSelect) {
+        localidadSelect.disabled = true;
+    }
+
+    if (paisSelect && provinciaSelect && localidadSelect) {
+        paisSelect.addEventListener('change', function() {
+            if (paisSelect.value) {
+                provinciaSelect.disabled = false;
+                fetch('/comercio/public/ajax/provincias?pais_id=' + paisSelect.value)
+                    .then(response => response.json())
+                    .then(data => {
+                        provinciaSelect.innerHTML = '<option value="">Seleccione una provincia</option>';
+                        data.forEach(function(provincia) {
+                            provinciaSelect.innerHTML += `<option value="${provincia.id}">${provincia.nombre}</option>`;
+                        });
+                        localidadSelect.innerHTML = '<option value="">Seleccione una localidad</option>';
+                        localidadSelect.disabled = true;
+                    });
+            } else {
+                provinciaSelect.innerHTML = '<option value="">Seleccione una provincia</option>';
+                provinciaSelect.disabled = true;
+                localidadSelect.innerHTML = '<option value="">Seleccione una localidad</option>';
+                localidadSelect.disabled = true;
+            }
+        });
+
+        provinciaSelect.addEventListener('change', function() {
+            if (provinciaSelect.value) {
+                localidadSelect.disabled = false;
+                fetch('/comercio/public/ajax/localidades?provincia_id=' + provinciaSelect.value)
+                    .then(response => response.json())
+                    .then(data => {
+                        localidadSelect.innerHTML = '<option value="">Seleccione una localidad</option>';
+                        data.forEach(function(localidad) {
+                            localidadSelect.innerHTML += `<option value="${localidad.id}">${localidad.nombre}</option>`;
+                        });
+                    });
+            } else {
+                localidadSelect.innerHTML = '<option value="">Seleccione una localidad</option>';
+                localidadSelect.disabled = true;
+            }
+        });
+    }
+});
+    // Example starter JavaScript for disabling form submissions if there are invalid fields
+(() => {
+  'use strict'
+
+  // Fetch all the forms we want to apply custom Bootstrap validation styles to
+  const forms = document.querySelectorAll('.needs-validation')
+
+  // Loop over them and prevent submission
+  Array.from(forms).forEach(form => {
+    form.addEventListener('submit', event => {
+      if (!form.checkValidity()) {
+        event.preventDefault()
+        event.stopPropagation()
+      }
+
+      form.classList.add('was-validated')
+    }, false)
+  })
+})()
+</script>
+{% endblock %}

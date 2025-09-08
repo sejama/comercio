@@ -40,7 +40,6 @@ final class PerfilController extends AbstractController
 
         return $this->render('perfil/index.html.twig', [
             'registrationForm' => $form,
-            'resetToken' => $token
         ]);
     }
 }

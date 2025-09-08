@@ -62,7 +62,7 @@ class Usuario implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var Collection<int, Negocio>
      */
-    #[ORM\ManyToMany(targetEntity: Negocio::class, mappedBy: 'dresponsable')]
+    #[ORM\ManyToMany(targetEntity: Negocio::class, mappedBy: 'responsable')]
     private Collection $negocios;
 
     public function __construct()
@@ -239,7 +239,7 @@ class Usuario implements UserInterface, PasswordAuthenticatedUserInterface
     {
         if (!$this->negocios->contains($negocio)) {
             $this->negocios->add($negocio);
-            $negocio->addDresponsable($this);
+            $negocio->addResponsable($this);
         }
 
         return $this;
@@ -248,7 +248,7 @@ class Usuario implements UserInterface, PasswordAuthenticatedUserInterface
     public function removeNegocio(Negocio $negocio): static
     {
         if ($this->negocios->removeElement($negocio)) {
-            $negocio->removeDresponsable($this);
+            $negocio->removeResponsable($this);
         }
 
         return $this;

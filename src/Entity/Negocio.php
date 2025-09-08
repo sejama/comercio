@@ -22,7 +22,7 @@ class Negocio
      * @var Collection<int, Usuario>
      */
     #[ORM\ManyToMany(targetEntity: Usuario::class, inversedBy: 'negocios')]
-    private Collection $dresponsable;
+    private Collection $responsable;
 
     /**
      * @var Collection<int, Sucursal>
@@ -32,7 +32,7 @@ class Negocio
 
     public function __construct()
     {
-        $this->dresponsable = new ArrayCollection();
+        $this->responsable = new ArrayCollection();
         $this->sucursales = new ArrayCollection();
     }
 
@@ -56,23 +56,23 @@ class Negocio
     /**
      * @return Collection<int, Usuario>
      */
-    public function getDresponsable(): Collection
+    public function getResponsable(): Collection
     {
-        return $this->dresponsable;
+        return $this->responsable;
     }
 
-    public function addDresponsable(Usuario $dresponsable): static
+    public function addResponsable(Usuario $responsable): static
     {
-        if (!$this->dresponsable->contains($dresponsable)) {
-            $this->dresponsable->add($dresponsable);
+        if (!$this->responsable->contains($responsable)) {
+            $this->responsable->add($responsable);
         }
 
         return $this;
     }
 
-    public function removeDresponsable(Usuario $dresponsable): static
+    public function removeResponsable(Usuario $responsable): static
     {
-        $this->dresponsable->removeElement($dresponsable);
+        $this->responsable->removeElement($responsable);
 
         return $this;
     }

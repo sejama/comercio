@@ -63,6 +63,11 @@
             </div>
             <div class="col-md-6 mb-3">
                 {{ form_label(registrationForm.email, 'Correo electrónico', { 'label_attr': { 'class': 'form-label' } }) }}
+                {% if app.user.isVerified %} 
+                    <span class="badge bg-success">Verificado</span>
+                {% else %}
+                    <span class="badge bg-warning text-dark">No verificado</span>
+                {% endif %}
                 {{ form_widget(registrationForm.email, { 
                     'attr': { 
                         'class': 'form-control',
@@ -103,7 +108,6 @@
         </div>
         <button type="submit" class="btn btn-primary">Actualizar</button>
     {{ form_end(registrationForm) }}
-    <a href="{{ url('app_reset_password', {token: resetToken.token}) }}">{{ url('app_reset_password', {token: resetToken.token}) }}</a>
 <script>
     // Example starter JavaScript for disabling form submissions if there are invalid fields
 (() => {
