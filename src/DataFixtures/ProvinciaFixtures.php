@@ -14,30 +14,30 @@ use Doctrine\Persistence\ObjectManager;
 
 class ProvinciaFixtures extends Fixture implements FixtureGroupInterface, DependentFixtureInterface
 {
-    public const SANTA_FE = 'santa-fe';
-    public const NEUQUEN = 'neuquen';
-    public const SAN_LUIS = 'san-luis';
-    public const CABA = 'c-a-buenos-aires';
-    public const LA_RIOJA = 'la-rioja';
-    public const CATAMARCA = 'catamarca';
-    public const TUCUMAN = 'tucuman';
-    public const CHACO = 'chaco';
-    public const FORMOSA = 'formosa';
-    public const SANTA_CRUZ = 'santa-cruz';
-    public const CHUBUT = 'chubut';
-    public const MENDOZA = 'mendoza';
-    public const ENTRE_RIOS = 'entre-rios';
-    public const SAN_JUAN = 'san-juan';
-    public const JUJUY = 'jujuy';
-    public const SANTIAGO_DEL_ESTERO = 'santiago-del-estero';
-    public const RIO_NEGRO = 'rio-negro';
-    public const CORRIENTES = 'corrientes';
-    public const MISIONES = 'misiones';
-    public const SALTA = 'salta';
-    public const CORDOBA = 'cordoba';
     public const BUENOS_AIRES = 'buenos-aires';
+    public const CABA = 'caba';
+    public const CATAMARCA = 'catamarca';
+    public const CHACO = 'chaco';
+    public const CHUBUT = 'chubut';
+    public const CORDOBA = 'cordoba';
+    public const CORRIENTES = 'corrientes';
+    public const ENTRE_RIOS = 'entre-rios';
+    public const FORMOSA = 'formosa';
+    public const JUJUY = 'jujuy';
     public const LA_PAMPA = 'la-pampa';
+    public const LA_RIOJA = 'la-rioja';
+    public const MENDOZA = 'mendoza';
+    public const MISIONES = 'misiones';
+    public const NEUQUEN = 'neuquen';
+    public const RIO_NEGRO = 'rio-negro';
+    public const SALTA = 'salta';
+    public const SAN_JUAN = 'san-juan';
+    public const SAN_LUIS = 'san-luis';
+    public const SANTA_CRUZ = 'santa-cruz';
+    public const SANTA_FE = 'santa-fe';
+    public const SANTIAGO_DEL_ESTERO = 'santiago-del-estero';
     public const TIERRA_DEL_FUEGO = 'tierra-del-fuego';
+    public const TUCUMAN = 'tucuman';
 
     public function load(ObjectManager $manager): void
     {
