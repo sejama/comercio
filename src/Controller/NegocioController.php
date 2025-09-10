@@ -70,7 +70,7 @@ final class NegocioController extends AbstractController
     {
         $paisId = $request->query->get('pais_id');
         $provincias = $em->getRepository(Provincia::class)
-            ->findBy(['pais' => $paisId]);
+            ->findBy(['pais' => $paisId],['nombre' => 'ASC']);
 
         $data = [];
         foreach ($provincias as $provincia) {
@@ -87,7 +87,7 @@ final class NegocioController extends AbstractController
     {
         $provinciaId = $request->query->get('provincia_id');
         $localidades = $em->getRepository(Localidad::class)
-            ->findBy(['provincia' => $provinciaId]);
+            ->findBy(['provincia' => $provinciaId], ['nombre' => 'ASC']);
 
         $data = [];
         foreach ($localidades as $localidad) {

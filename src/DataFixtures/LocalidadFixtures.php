@@ -48,8 +48,8 @@ class LocalidadFixtures extends Fixture implements FixtureGroupInterface, Depend
             $manager->persist($localidad);
 
             // Forzar para especificar un ID
-            $metadata = $manager->getClassMetaData($localidad::class);
-            $metadata->setIdGeneratorType(ClassMetadata::GENERATOR_TYPE_NONE);
+            //$metadata = $manager->getClassMetaData($localidad::class);
+            //$metadata->setIdGeneratorType(ClassMetadata::GENERATOR_TYPE_NONE);
         }
 
         $manager->flush();
@@ -82,7 +82,7 @@ class LocalidadFixtures extends Fixture implements FixtureGroupInterface, Depend
         $localidad->setNombre($data['nombre']);
         $localidad->setCodigoPostal($data['codigoPostal']);
 
-        $this->addReference($data['referencia'], $localidad);
+        //$this->addReference($data['referencia'], $localidad);
 
         $localidad->setProvincia($this->getReference($data['provincia'], Provincia::class));
 
@@ -96,7 +96,7 @@ class LocalidadFixtures extends Fixture implements FixtureGroupInterface, Depend
     {
 
         $localidadesData = [];
-        $dir = './Localidades/';
+        $dir = __DIR__ .'/Localidades/';
 
         $provincias = [
             [
@@ -204,15 +204,14 @@ class LocalidadFixtures extends Fixture implements FixtureGroupInterface, Depend
                 $localidades = file($file);
                 foreach ($localidades as $localidad) {
                     $localidadesData[] = [
-                        'nombre' => $localidad[0],
+                        'nombre' => $localidad,
                         'codigoPostal' => "0000",
-                        'referencia' => $provincia[1],
+                        //'referencia' => $provincia[1],
                         'provincia' => $provincia[0],
                     ];
                 }
             }
         }
-
         return $localidadesData;
     }
 }
