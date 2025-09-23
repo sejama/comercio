@@ -1,0 +1,116 @@
+{% extends 'base.html.twig' %}
+
+
+
+{% block body %}
+<h1>{% block title %}Crear Producto{% endblock %}</h1>
+
+{{ form_errors(productoForm) }}
+
+{{ form_start(productoForm, { 'attr': { 'class': 'needs-validation text-start', 'novalidate': true } }) }}
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            {{ form_label(productoForm.nombre, 'Nombre', { 'label_attr': { 'class': 'form-label' } }) }}
+            {{ form_widget(productoForm.nombre, { 
+                'attr': { 
+                'class': 'form-control',
+                'required': true
+            }
+            }) }}
+            <div class="invalid-feedback">
+                Por favor ingrese un nombre.
+            </div>
+            {{ form_errors(productoForm.nombre) }}
+        </div>
+        <div class="col-md-6 mb-3">
+            {{ form_label(productoForm.descripcion, 'Descripción', { 'label_attr': { 'class': 'form-label' } }) }}
+            {{ form_widget(productoForm.descripcion, { 
+                'attr': { 
+                'class': 'form-control',
+                'required': false
+            }
+            }) }}
+            <div class="invalid-feedback">
+                Por favor ingrese un código.
+            </div>
+            {{ form_errors(productoForm.descripcion) }}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            {{ form_label(productoForm.codigo, 'Código', { 'label_attr': { 'class': 'form-label' } }) }}
+            {{ form_widget(productoForm.codigo, { 
+                'attr': { 
+                'class': 'form-control',
+                'required': true
+            }
+            }) }}
+            <div class="invalid-feedback">
+                Por favor ingrese un código.
+            </div>
+            {{ form_errors(productoForm.codigo) }}
+        </div>
+        <div class="col-md-6 mb-3">
+            {{ form_label(productoForm.categoria, 'Categoría', { 'label_attr': { 'id': 'producto_categoria_label', 'class': 'form-label' } }) }}
+            {{ form_widget(productoForm.categoria, { 'attr': { 'class': 'form-select', 'id': 'producto_categoria', 'required': true } }) }}
+            <div class="invalid-feedback">
+                Por favor seleccione una categoría.
+            </div>
+            {{ form_errors(productoForm.categoria) }}
+            <div id="nueva-categoria-div" style="display:none;">
+                {{ form_label(productoForm.nueva_categoria, 'Nueva Categoría', { 'label_attr': { 'class': 'form-label' } }) }}
+                {{ form_widget(productoForm.nueva_categoria, { 'attr': { 'id': 'nueva-categoria', 'class': 'form-control' } }) }}
+                {{ form_errors(productoForm.nueva_categoria) }}
+                <div class="invalid-feedback">
+                    Por favor ingrese una nueva categoría.
+                </div>
+            </div>
+        </div>
+    </div>
+    <button class="btn btn-primary" type="submit">Crear Producto</button>
+{{ form_end(productoForm) }}
+
+<script>
+    document.getElementById('producto_categoria').addEventListener('change', function() {
+        var nuevaDiv = document.getElementById('nueva-categoria-div');
+        var inputNuevaCat = document.getElementById('nueva-categoria');
+        var labelCat = document.getElementById('producto_categoria_label');
+        var selectCat = document.getElementById('producto_categoria');
+        var inputNuevaCat = nuevaDiv.querySelector('input');
+        if (this.value === '1') {
+            nuevaDiv.style.display = 'block';
+            inputNuevaCat.style.display = 'block';
+            inputNuevaCat.required = true;
+            labelCat.style.display = 'none';
+            selectCat.style.display = 'none';
+            selectCat.required = false;
+        } else {
+            nuevaDiv.style.display = 'none';
+            inputNuevaCat.style.display = 'none';   
+            inputNuevaCat.required = false;
+            labelCat.style.display = 'block';
+            selectCat.style.display = 'block';
+            selectCat.required = true;
+        }
+    });
+
+    (function () {
+        'use strict'
+
+        var forms = document.querySelectorAll('.needs-validation')
+
+        Array.prototype.slice.call(forms)
+            .forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+
+                    form.classList.add('was-validated')
+                }, false)
+            })
+    })()
+</script>
+
+{% endblock %}
