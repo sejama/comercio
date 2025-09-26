@@ -4,6 +4,8 @@ namespace App\Form;
 
 use App\Entity\CategoriaProducto;
 use App\Entity\Producto;
+use App\Entity\Sucursal;
+use Dom\Entity;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -41,6 +43,16 @@ class ProductoType extends AbstractType
                 'label' => 'Nueva Categoría',
                 'required' => false,
                 'mapped' => false,
+                'label' => false,
+                'attr' => ['style' => 'display:none;'],
+            ])
+            ->add('sucursal', EntityType::class, [
+                'class' => Sucursal::class,
+                'choice_label' => 'nombre',
+                'placeholder' => 'Seleccione una sucursal',
+                'required' => false,
+                'mapped' => false,
+                'label' => false, 
                 'attr' => ['style' => 'display:none;'],
             ])
         ;
@@ -51,6 +63,7 @@ class ProductoType extends AbstractType
         $resolver->setDefaults([
             'data_class' => Producto::class,
             'categorias' => [],
+            'sucursales' => [],
         ]);
     }
 }

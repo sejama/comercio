@@ -18,7 +18,19 @@ final class ProductoController extends AbstractController
         if (!$this->getUser()) {
             return $this->redirectToRoute('app_login');
         }
+        $productos = [];
+        $negocios = $this->getUser()->getNegocios();
+        foreach ($negocios as $negocio) {
+            $sucursales = $negocio->getSucursales();
+            foreach ($sucursales as $sucursal) {
+                $categorias = $sucursal->getCategoriaProductos();
+                foreach ($categorias as $categoria) {
+                    $productos = array_merge($productos, $categoria->getProductos()->toArray());
+                }
+            }
+        }
         return $this->render('producto/index.html.twig', [
+            'productos' => $productos
         ]);
     }
 
@@ -37,8 +49,20 @@ final class ProductoController extends AbstractController
             $categorias[$cat->getNombre()] = $cat->getId();
         }
 
+        $sucursales = [];
+        foreach ($this->getUser()->getNegocios() as $negocio) {
+            if (count($negocio->getSucursales()) > 1) {
+                foreach ($negocio->getSucursales() as $sucursal) {
+                    $sucursales[$sucursal->getNombre()] = $sucursal->getId();
+                }
+            }else {
+                $sucursal = $negocio->getSucursales()[0];
+            }
+        }
+
         $productoForm = $this->createForm(ProductoType::class, null, [
             'categorias' => $categorias,
+            'sucursales' => $sucursales,
         ]);
 
         $productoForm->handleRequest($request);
@@ -49,8 +73,12 @@ final class ProductoController extends AbstractController
 
             if ($producto->getCategoria()->getId() === 1) {
                 $nombreNuevaCategoria = $productoForm->get('nueva_categoria')->getData();
+                if ($sucursales != []) {
+                    $sucursal = $productoForm->get('sucursal')->getData();
+                }
                 $categoria = new CategoriaProducto();
                 $categoria->setNombre($nombreNuevaCategoria);
+                $categoria->setSucursal($sucursal);
                 $entityManager->persist($categoria);
                 $entityManager->flush();
                 $producto->setCategoria($categoria);
@@ -66,5 +94,39 @@ final class ProductoController extends AbstractController
         return $this->render('producto/create.html.twig', [
             'productoForm' => $productoForm,
         ]);
+    }
+
+    #[Route('/producto/{id}/edit', name: 'app_producto_edit')]
+    public function edit(
+        EntityManagerInterface $entityManager,
+        Request $request,
+        int $id
+    ): Response
+    {
+        return $this->redirectToRoute('app_producto_index'); 
+    }
+
+    #[Route('/producto/{id}/delete', name: 'app_producto_delete')]
+    public function delete(
+        EntityManagerInterface $entityManager,
+        int $id
+    ): Response
+    {
+        if (!$this->getUser()) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        $producto = $entityManager->getRepository('App\Entity\Producto')->find($id);
+
+        if (!$producto) {
+            $this->addFlash('error', 'Producto no encontrado.');
+            return $this->redirectToRoute('app_producto_index');
+        }
+
+        $entityManager->remove($producto);
+        $entityManager->flush();
+
+        $this->addFlash('success', 'Producto eliminado con éxito.');
+        return $this->redirectToRoute('app_producto_index');
     }
 }

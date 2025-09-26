@@ -27,6 +27,9 @@ class CategoriaProducto
     #[ORM\OneToMany(targetEntity: Producto::class, mappedBy: 'categoria')]
     private Collection $productos;
 
+    #[ORM\ManyToOne(inversedBy: 'categoriaProductos')]
+    private ?Sucursal $sucursal = null;
+
     public function __construct()
     {
         $this->productos = new ArrayCollection();
@@ -87,6 +90,18 @@ class CategoriaProducto
                 $producto->setCategoria(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getSucursal(): ?Sucursal
+    {
+        return $this->sucursal;
+    }
+
+    public function setSucursal(?Sucursal $sucursal): static
+    {
+        $this->sucursal = $sucursal;
 
         return $this;
     }

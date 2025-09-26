@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\SucursalRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: SucursalRepository::class)]
@@ -25,6 +27,17 @@ class Sucursal
     #[ORM\ManyToOne(inversedBy: 'sucursales')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Localidad $localidad = null;
+
+    /**
+     * @var Collection<int, CategoriaProducto>
+     */
+    #[ORM\OneToMany(targetEntity: CategoriaProducto::class, mappedBy: 'sucursal')]
+    private Collection $categoriaProductos;
+
+    public function __construct()
+    {
+        $this->categoriaProductos = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -75,6 +88,36 @@ class Sucursal
     public function setLocalidad(?Localidad $localidad): static
     {
         $this->localidad = $localidad;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, CategoriaProducto>
+     */
+    public function getCategoriaProductos(): Collection
+    {
+        return $this->categoriaProductos;
+    }
+
+    public function addCategoriaProducto(CategoriaProducto $categoriaProducto): static
+    {
+        if (!$this->categoriaProductos->contains($categoriaProducto)) {
+            $this->categoriaProductos->add($categoriaProducto);
+            $categoriaProducto->setSucursal($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCategoriaProducto(CategoriaProducto $categoriaProducto): static
+    {
+        if ($this->categoriaProductos->removeElement($categoriaProducto)) {
+            // set the owning side to null (unless already changed)
+            if ($categoriaProducto->getSucursal() === $this) {
+                $categoriaProducto->setSucursal(null);
+            }
+        }
 
         return $this;
     }

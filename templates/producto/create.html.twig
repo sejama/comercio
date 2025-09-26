@@ -67,30 +67,51 @@
             </div>
         </div>
     </div>
+    {% if productoForm.sucursal|length > 1 %}
+    <div class="row">
+        <div class="col-md-6 mb-3"></div>
+        <div class="col-md-6 mb-3">
+            <div id="nueva-categoria-sucursal-div" style="display:none;">
+                {{ form_label(productoForm.sucursal, 'Sucursal', { 'label_attr': { 'class': 'form-label' } }) }}
+                {{ form_widget(productoForm.sucursal, { 'attr': { 'class': 'form-select', 'id': 'producto_sucursal' } }) }}
+                <div class="invalid-feedback">
+                    Por favor seleccione una sucursal.
+                </div>
+                {{ form_errors(productoForm.sucursal) }}
+            </div>
+        </div>
+    </div>
+    {% endif %}
     <button class="btn btn-primary" type="submit">Crear Producto</button>
 {{ form_end(productoForm) }}
 
 <script>
     document.getElementById('producto_categoria').addEventListener('change', function() {
-        var nuevaDiv = document.getElementById('nueva-categoria-div');
+        var nuevaCatDiv = document.getElementById('nueva-categoria-div');
+        var nuevaCatSucDiv = document.getElementById('nueva-categoria-sucursal-div');
         var inputNuevaCat = document.getElementById('nueva-categoria');
-        var labelCat = document.getElementById('producto_categoria_label');
         var selectCat = document.getElementById('producto_categoria');
-        var inputNuevaCat = nuevaDiv.querySelector('input');
+        var inputNuevaCat = nuevaCatDiv.querySelector('input');
+        var labelCat = document.getElementById('producto_categoria_label');
+        
+        if (nuevaCatSucDiv) {
+            var inputNuevaCatSuc = nuevaCatSucDiv.querySelector('input');
+            var selectSucursal = document.getElementById('producto_sucursal');
+        }
+
         if (this.value === '1') {
-            nuevaDiv.style.display = 'block';
+            nuevaCatDiv.style.display = 'block';
             inputNuevaCat.style.display = 'block';
             inputNuevaCat.required = true;
+            if (nuevaCatSucDiv) {
+                inputNuevaCatSuc.required = true;
+                nuevaCatSucDiv.style.display = 'block';
+                selectSucursal.style.display = 'block';
+                selectSucursal.required = true;
+            }
             labelCat.style.display = 'none';
             selectCat.style.display = 'none';
             selectCat.required = false;
-        } else {
-            nuevaDiv.style.display = 'none';
-            inputNuevaCat.style.display = 'none';   
-            inputNuevaCat.required = false;
-            labelCat.style.display = 'block';
-            selectCat.style.display = 'block';
-            selectCat.required = true;
         }
     });
 
