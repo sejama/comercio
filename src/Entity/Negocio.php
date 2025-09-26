@@ -30,10 +30,17 @@ class Negocio
     #[ORM\OneToMany(targetEntity: Sucursal::class, mappedBy: 'negocio')]
     private Collection $sucursales;
 
+    /**
+     * @var Collection<int, Cliente>
+     */
+    #[ORM\OneToMany(targetEntity: Cliente::class, mappedBy: 'negocio', orphanRemoval: true)]
+    private Collection $clientes;
+
     public function __construct()
     {
         $this->responsable = new ArrayCollection();
         $this->sucursales = new ArrayCollection();
+        $this->clientes = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -101,6 +108,36 @@ class Negocio
             // set the owning side to null (unless already changed)
             if ($sucursale->getNegocio() === $this) {
                 $sucursale->setNegocio(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Cliente>
+     */
+    public function getClientes(): Collection
+    {
+        return $this->clientes;
+    }
+
+    public function addCliente(Cliente $cliente): static
+    {
+        if (!$this->clientes->contains($cliente)) {
+            $this->clientes->add($cliente);
+            $cliente->setNegocio($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCliente(Cliente $cliente): static
+    {
+        if ($this->clientes->removeElement($cliente)) {
+            // set the owning side to null (unless already changed)
+            if ($cliente->getNegocio() === $this) {
+                $cliente->setNegocio(null);
             }
         }
 
