@@ -1,4 +1,187 @@
-{{ form_start(form) }}
-    {{ form_widget(form) }}
-    <button class="btn">{{ button_label|default('Save') }}</button>
+{{ form_start(form, { 'attr': { 'class': 'needs-validation text-start', 'novalidate': true } }) }}
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            {{ form_label(form.nombre, 'Nombre', { 'label_attr': { 'class': 'form-label' } }) }}
+            {{ form_widget(form.nombre, { 
+                'attr': { 
+                'class': 'form-control',
+                'required': true
+            }
+            }) }}
+            <div class="invalid-feedback">
+                Por favor ingrese un nombre.
+            </div>
+            {{ form_errors(form.nombre) }}
+        </div>
+        <div class="col-md-6 mb-3">
+            {{ form_label(form.apellido, 'Apellido', { 'label_attr': { 'class': 'form-label' } }) }}
+            {{ form_widget(form.apellido, { 
+                'attr': { 
+                'class': 'form-control',
+                'required': true
+            }
+            }) }}
+            <div class="invalid-feedback">
+                Por favor ingrese un apellido.
+            </div>
+            {{ form_errors(form.apellido) }}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            {{ form_label(form.correo, 'Correo', { 'label_attr': { 'class': 'form-label' } }) }}
+            {{ form_widget(form.correo, { 
+                'attr': { 
+                'class': 'form-control',
+                'required': true
+            }
+            }) }}
+            <div class="invalid-feedback">
+                Por favor ingrese un correo válido.
+            </div>
+            {{ form_errors(form.correo) }}
+        </div>
+        <div class="col-md-4 mb-3">
+            {{ form_label(form.telefono, 'Teléfono', { 'label_attr': { 'class': 'form-label' } }) }}
+            {{ form_widget(form.telefono, { 
+                'attr': { 
+                'class': 'form-control',
+                'required': false
+            }
+            }) }}
+            <div class="invalid-feedback">
+                Por favor ingrese un teléfono.
+            </div>
+            {{ form_errors(form.telefono) }}
+        </div>
+        <div class="col-md-4 mb-3">
+            {{ form_label(form.celular, 'Celular', { 'label_attr': { 'class': 'form-label' } }) }}
+            {{ form_widget(form.celular, { 
+                'attr': { 
+                'class': 'form-control',
+                'required': false
+            }
+            }) }}
+            <div class="invalid-feedback">
+                Por favor ingrese una celular.
+            </div>
+            {{ form_errors(form.celular) }}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            {{ form_label(form.domicilio, 'Dirección', { 'label_attr': { 'class': 'form-label' } }) }}
+            {{ form_widget(form.domicilio, { 
+                'attr': { 
+                'class': 'form-control',
+                'required': false,
+                'rows': 2
+            }
+            }) }}
+            <div class="invalid-feedback">
+                Por favor ingrese una dirección.
+            </div>
+            {{ form_errors(form.domicilio) }}
+        </div>
+        <div class="col-md-2 mb-3">
+            {{ form_label(form.pais, 'País', { 'label_attr': { 'class': 'form-label' } }) }}
+            {{ form_widget(form.pais, { 'attr': { 'class': 'form-select', 'required': true } }) }}
+            <div class="invalid-feedback">
+                Por favor seleccione un país.
+            </div>
+            {{ form_errors(form.pais) }}
+        </div>
+        <div class="col-md-2 mb-3">
+            {{ form_label(form.provincia, 'Provincia', { 'label_attr': { 'class': 'form-label' } }) }}
+            {{ form_widget(form.provincia, { 'attr': { 'class': 'form-select', 'required': true } }) }}
+            <div class="invalid-feedback">
+                Por favor seleccione una provincia.
+            </div>
+            {{ form_errors(form.provincia) }}
+        </div>
+        <div class="col-md-2 mb-3">
+            {{ form_label(form.localidad, 'Localidad', { 'label_attr': { 'id': 'cliente_label', 'class': 'form-label' } }) }}
+            {{ form_widget(form.localidad, { 'attr': { 'class': 'form-select', 'id': 'cliente_sucursal', 'required': true } }) }}
+            <div class="invalid-feedback">
+                Por favor seleccione una localidad.
+            </div>
+            {{ form_errors(form.localidad) }}
+        </div>
+    </div>
+
+    <button class="btn btn-primary btn-sm">{{ button_label|default('Crear') }}</button>
 {{ form_end(form) }}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+    const paisSelect = document.getElementById('cliente_pais');
+    const provinciaSelect = document.getElementById('cliente_provincia');
+    const localidadSelect = document.getElementById('cliente_localidad');
+
+    // Deshabilitar provincia y localidad al inicio
+    if (provinciaSelect) {
+        provinciaSelect.disabled = true;
+    }
+    if (localidadSelect) {
+        localidadSelect.disabled = true;
+    }
+
+    if (paisSelect && provinciaSelect && localidadSelect) {
+        paisSelect.addEventListener('change', function() {
+            if (paisSelect.value) {
+                provinciaSelect.disabled = false;
+                fetch('/comercio/public/ajax/provincias?pais_id=' + paisSelect.value)
+                    .then(response => response.json())
+                    .then(data => {
+                        provinciaSelect.innerHTML = '<option value="">Seleccione una provincia</option>';
+                        data.forEach(function(provincia) {
+                            provinciaSelect.innerHTML += `<option value="${provincia.id}">${provincia.nombre}</option>`;
+                        });
+                        localidadSelect.innerHTML = '<option value="">Seleccione una localidad</option>';
+                        localidadSelect.disabled = true;
+                    });
+            } else {
+                provinciaSelect.innerHTML = '<option value="">Seleccione una provincia</option>';
+                provinciaSelect.disabled = true;
+                localidadSelect.innerHTML = '<option value="">Seleccione una localidad</option>';
+                localidadSelect.disabled = true;
+            }
+        });
+
+        provinciaSelect.addEventListener('change', function() {
+            if (provinciaSelect.value) {
+                localidadSelect.disabled = false;
+                fetch('/comercio/public/ajax/localidades?provincia_id=' + provinciaSelect.value)
+                    .then(response => response.json())
+                    .then(data => {
+                        localidadSelect.innerHTML = '<option value="">Seleccione una localidad</option>';
+                        data.forEach(function(localidad) {
+                            localidadSelect.innerHTML += `<option value="${localidad.id}">${localidad.nombre}</option>`;
+                        });
+                    });
+            } else {
+                localidadSelect.innerHTML = '<option value="">Seleccione una localidad</option>';
+                localidadSelect.disabled = true;
+            }
+        });                                 
+    }
+});
+    // Example starter JavaScript for disabling form submissions if there are invalid fields
+(() => {
+    'use strict'
+
+    // Fetch all the forms we want to apply custom Bootstrap validation styles to
+    const forms = document.querySelectorAll('.needs-validation')
+
+    // Loop over them and prevent submission
+    Array.from(forms).forEach(form => {
+        form.addEventListener('submit', event => {
+        if (!form.checkValidity()) {
+            event.preventDefault()
+            event.stopPropagation()
+        }
+
+        form.classList.add('was-validated')
+        }, false)
+    })
+})()
+</script>

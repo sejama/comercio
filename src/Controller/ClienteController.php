@@ -26,11 +26,12 @@ final class ClienteController extends AbstractController
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $cliente = new Cliente();
+        $cliente->setNegocio($this->getUser()->getNegocios()[0]);
         $form = $this->createForm(ClienteType::class, $cliente);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($cliente);
+            $entityManager->persist($cliente);  
             $entityManager->flush();
 
             return $this->redirectToRoute('app_cliente_index', [], Response::HTTP_SEE_OTHER);
