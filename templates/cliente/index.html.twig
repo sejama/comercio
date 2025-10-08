@@ -36,7 +36,8 @@
                 <td>{{ cliente.correo }}</td>
                 <td>{{ cliente.telefono }}</td>
                 <td>
-                        <a href="{{ path('app_cliente_edit', {'id': cliente.id}) }}" class="btn btn-primary btn-sm">Ver</a>
+                    <a href="{{ path('app_cliente_show', {'id': cliente.id}) }}" class="btn btn-primary btn-sm">Ver</a>
+                    {{ include('cliente/_delete_form.html.twig') }}
                 </td>
             </tr>
         {% else %}

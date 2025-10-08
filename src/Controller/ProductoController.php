@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\CategoriaProducto;
+use App\Entity\Producto;
 use App\Form\ProductoType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -10,9 +11,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
+#[Route('/producto')]
 final class ProductoController extends AbstractController
 {
-    #[Route('/producto', name: 'app_producto_index')]
+    #[Route(name: 'app_producto_index')]
     public function index(): Response
     {
         if (!$this->getUser()) {
@@ -34,7 +36,7 @@ final class ProductoController extends AbstractController
         ]);
     }
 
-    #[Route('/producto/create', name: 'app_producto_create')]
+    #[Route('/new', name: 'app_producto_new')]
     public function create(
         EntityManagerInterface $entityManager,
         Request $request
@@ -91,22 +93,74 @@ final class ProductoController extends AbstractController
             return $this->redirectToRoute('app_producto_index');
         }
 
-        return $this->render('producto/create.html.twig', [
+        return $this->render('producto/new.html.twig', [
             'productoForm' => $productoForm,
         ]);
     }
 
-    #[Route('/producto/{id}/edit', name: 'app_producto_edit')]
-    public function edit(
-        EntityManagerInterface $entityManager,
-        Request $request,
-        int $id
-    ): Response
+    #[Route('/{id}', name: 'app_producto_show', methods: ['GET'])]
+    public function show(Producto $producto): Response
     {
-        return $this->redirectToRoute('app_producto_index'); 
+        return $this->render('producto/show.html.twig', [
+            'producto' => $producto,
+        ]);
     }
 
-    #[Route('/producto/{id}/delete', name: 'app_producto_delete')]
+    #[Route('/{id}/edit', name: 'app_producto_edit')]
+    public function edit(
+        Request $request,
+        Producto $producto,
+        EntityManagerInterface $entityManager,
+    ): Response
+    {
+        $categorias = [];
+        foreach ($entityManager->getRepository(CategoriaProducto::class)->findAll() as $cat) {
+            $categorias[$cat->getNombre()] = $cat->getId();
+        }
+
+        $sucursales = [];
+        foreach ($this->getUser()->getNegocios() as $negocio) {
+            if (count($negocio->getSucursales()) > 1) {
+                foreach ($negocio->getSucursales() as $sucursal) {
+                    $sucursales[$sucursal->getNombre()] = $sucursal->getId();
+                }
+            }else {
+                $sucursal = $negocio->getSucursales()[0];
+            }
+        }
+
+        $productoForm = $this->createForm(ProductoType::class, $producto, [
+            'categorias' => $categorias,
+            'sucursales' => $sucursales,
+        ]);
+
+        $productoForm->handleRequest($request);
+
+        if ($productoForm->isSubmitted() && $productoForm->isValid()) {
+            if ($producto->getCategoria()->getId() === 1) {
+                $nombreNuevaCategoria = $productoForm->get('nueva_categoria')->getData();
+                if ($sucursales != []) {
+                    $sucursal = $productoForm->get('sucursal')->getData();
+                }
+                $categoria = new CategoriaProducto();
+                $categoria->setNombre($nombreNuevaCategoria);
+                $categoria->setSucursal($sucursal);
+                $entityManager->persist($categoria);
+                $entityManager->flush();
+                $producto->setCategoria($categoria);
+            }
+            $entityManager->flush();
+            $this->addFlash('success', 'Producto actualizado con éxito.');
+            return $this->redirectToRoute('app_producto_index');
+        }
+        
+        return $this->render('producto/edit.html.twig', [
+            'productoForm' => $productoForm,
+            'producto' => $producto,
+        ]); 
+    }
+
+    #[Route('/{id}/delete', name: 'app_producto_delete')]
     public function delete(
         EntityManagerInterface $entityManager,
         int $id

@@ -15,7 +15,7 @@
     </div>
 {% endfor %}
 
-<a href="{{ path('app_producto_create') }}" class="btn btn-success mb-3">Crear nuevo producto</a>
+<a href="{{ path('app_producto_new') }}" class="btn btn-success mb-3">Crear nuevo producto</a>
 
 <table class="table table-striped">
     <thead>
@@ -35,11 +35,8 @@
                 <td>{{ producto.codigo }}</td>
                 <td>{{ producto.categoria ? producto.categoria.nombre : 'Sin categoría' }}</td>
                 <td>
-                    <a href="{{ path('app_producto_edit', {'id': producto.id}) }}" class="btn btn-primary btn-sm">Editar</a>
-                    <form method="post" action="{{ path('app_producto_delete', {'id': producto.id}) }}" style="display:inline-block;" onsubmit="return confirm('¿Está seguro de que desea eliminar este producto?');">
-                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ producto.id) }}">
-                        <button class="btn btn-danger btn-sm">Eliminar</button>
-                    </form>
+                    <a href="{{ path('app_producto_show', {'id': producto.id}) }}" class="btn btn-primary btn-sm">Ver</a>
+                    {{ include('producto/_delete_form.html.twig') }}
                 </td>
             </tr>
         {% else %}
@@ -49,5 +46,4 @@
         {% endfor %}
     </tbody>
 </table>
-
 {% endblock %}
