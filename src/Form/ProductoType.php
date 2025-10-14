@@ -32,6 +32,10 @@ class ProductoType extends AbstractType
                 'label' => 'Código del Producto',
                 'required' => true
             ])
+            ->add('precio_actual', null, [
+                'label' => 'Precio del Producto',
+                'required' => true
+            ])
             ->add('categoria', EntityType::class, [
                 'class' => CategoriaProducto::class,
                 'choice_label' => 'nombre',

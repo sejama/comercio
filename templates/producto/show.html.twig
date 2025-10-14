@@ -25,6 +25,29 @@
                 <th>Categoría</th>
                 <td>{{ producto.categoria.nombre }}</td>
             </tr>
+            <tr>
+                <th>Precio Actual</th>
+                <td>$ {{ producto.precioActual }}</td>
+            </tr>
+        </tbody>
+    </table>
+    <p>Historial de precios</p>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Fecha Desde</th>
+                <th>Fecha Hasta</th>
+                <th>Precio</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for precio in producto.precioHistoricos %}
+                <tr>
+                    <td>{{ precio.getFechaDesde|date('d/m/Y H:i:s') }}</td>
+                    <td>{% if precio.getFechaHasta %}{{ precio.getFechaHasta|date('d/m/Y H:i:s') }}{% else %}Actual{% endif %}</td>
+                    <td>$ {{ precio.precio }}</td>
+                </tr>
+            {% endfor %}
         </tbody>
     </table>
 

@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\CategoriaProducto;
+use App\Entity\PrecioHistorico;
 use App\Entity\Producto;
 use App\Form\ProductoType;
 use Doctrine\ORM\EntityManagerInterface;
@@ -86,6 +87,12 @@ final class ProductoController extends AbstractController
                 $producto->setCategoria($categoria);
             }
 
+            $historialPrecio = new PrecioHistorico();
+            $historialPrecio->setProducto($producto);
+            $historialPrecio->setPrecio($producto->getPrecioActual());
+            $historialPrecio->setFechaDesde(new \DateTimeImmutable('now', new \DateTimeZone('America/Argentina/Buenos_Aires')));
+            $entityManager->persist($historialPrecio);
+
             $entityManager->persist($producto);
             $entityManager->flush();
 
@@ -149,6 +156,20 @@ final class ProductoController extends AbstractController
                 $entityManager->flush();
                 $producto->setCategoria($categoria);
             }
+
+            $historialPrecioLast = $producto->getPrecioHistoricos()->last();
+            if ($historialPrecioLast->getPrecio() != $producto->getPrecioActual()) {
+                $historialPrecioLast->setFechaHasta(new \DateTimeImmutable('now', new \DateTimeZone('America/Argentina/Buenos_Aires')));
+                $entityManager->persist($historialPrecioLast);    
+
+                $historialPrecioNew = new PrecioHistorico();
+                $historialPrecioNew->setProducto($producto);
+                $historialPrecioNew->setPrecio($producto->getPrecioActual());
+                $historialPrecioNew->setFechaDesde(new \DateTimeImmutable('now', new \DateTimeZone('America/Argentina/Buenos_Aires')));
+                $entityManager->persist($historialPrecioNew);
+                $entityManager->persist($producto);
+            }
+
             $entityManager->flush();
             $this->addFlash('success', 'Producto actualizado con éxito.');
             return $this->redirectToRoute('app_producto_index');
@@ -175,6 +196,11 @@ final class ProductoController extends AbstractController
         if (!$producto) {
             $this->addFlash('error', 'Producto no encontrado.');
             return $this->redirectToRoute('app_producto_index');
+        }
+
+        $historialPrecio = $producto->getPrecioHistoricos();
+        foreach ($historialPrecio as $hp) {
+            $entityManager->remove($hp);
         }
 
         $entityManager->remove($producto);

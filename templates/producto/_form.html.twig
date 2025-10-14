@@ -75,6 +75,34 @@
         </div>
     </div>
     {% endif %}
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            {{ form_label(productoForm.precio_actual, 'Precio', { 'label_attr': { 'class': 'form-label' } }) }}
+            
+            {% set precio_raw = productoForm.precio_actual.vars.value|default('') %}
+            {% if precio_raw != '' %}
+                {% set precio_num = (precio_raw|replace({',': '.'})) %}
+                {% set precio_val_formatted = precio_num|number_format(2, '.', '') %}
+            {% else %}
+                {% set precio_val_formatted = '' %}
+            {% endif %}
+
+            {{ form_widget(productoForm.precio_actual, { 
+                'type': 'number',
+                'attr': { 
+                'step': '0.01',
+                'class': 'form-control',
+                'min': '0',
+                'required': true,
+                'value': precio_val_formatted
+            }
+            }) }}
+            <div class="invalid-feedback">
+                Por favor ingrese un precio.
+            </div>
+            {{ form_errors(productoForm.precio_actual) }}
+        </div>
+    </div>
     <button class="btn btn-primary btn-sm">{{ button_label|default('Crear') }}</button>
 {{ form_end(productoForm) }}
 

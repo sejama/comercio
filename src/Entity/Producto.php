@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\ProductoRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ProductoRepository::class)]
@@ -25,6 +27,30 @@ class Producto
     #[ORM\ManyToOne(inversedBy: 'productos')]
     #[ORM\JoinColumn(nullable: false)]
     private ?CategoriaProducto $categoria = null;
+
+    #[ORM\Column]
+    private ?float $precio_actual = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?float $stock_actual = null;
+
+    /**
+     * @var Collection<int, PrecioHistorico>
+     */
+    #[ORM\OneToMany(targetEntity: PrecioHistorico::class, mappedBy: 'producto')]
+    private Collection $precioHistoricos;
+
+    /**
+     * @var Collection<int, StockMovimiento>
+     */
+    #[ORM\OneToMany(targetEntity: StockMovimiento::class, mappedBy: 'producto')]
+    private Collection $stockMovimientos;
+
+    public function __construct()
+    {
+        $this->precioHistoricos = new ArrayCollection();
+        $this->stockMovimientos = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -75,6 +101,90 @@ class Producto
     public function setCategoria(?CategoriaProducto $categoria): static
     {
         $this->categoria = $categoria;
+
+        return $this;
+    }
+
+    public function getPrecioActual(): ?float
+    {
+        return $this->precio_actual;
+    }
+
+    public function setPrecioActual(float $precio_actual): static
+    {
+        $this->precio_actual = $precio_actual;
+
+        return $this;
+    }
+
+    public function getStockActual(): ?float
+    {
+        return $this->stock_actual;
+    }
+
+    public function setStockActual(?float $stock_actual): static
+    {
+        $this->stock_actual = $stock_actual;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, PrecioHistorico>
+     */
+    public function getPrecioHistoricos(): Collection
+    {
+        return $this->precioHistoricos;
+    }
+
+    public function addPrecioHistorico(PrecioHistorico $precioHistorico): static
+    {
+        if (!$this->precioHistoricos->contains($precioHistorico)) {
+            $this->precioHistoricos->add($precioHistorico);
+            $precioHistorico->setProducto($this);
+        }
+
+        return $this;
+    }
+
+    public function removePrecioHistorico(PrecioHistorico $precioHistorico): static
+    {
+        if ($this->precioHistoricos->removeElement($precioHistorico)) {
+            // set the owning side to null (unless already changed)
+            if ($precioHistorico->getProducto() === $this) {
+                $precioHistorico->setProducto(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, StockMovimiento>
+     */
+    public function getStockMovimientos(): Collection
+    {
+        return $this->stockMovimientos;
+    }
+
+    public function addStockMovimiento(StockMovimiento $stockMovimiento): static
+    {
+        if (!$this->stockMovimientos->contains($stockMovimiento)) {
+            $this->stockMovimientos->add($stockMovimiento);
+            $stockMovimiento->setProducto($this);
+        }
+
+        return $this;
+    }
+
+    public function removeStockMovimiento(StockMovimiento $stockMovimiento): static
+    {
+        if ($this->stockMovimientos->removeElement($stockMovimiento)) {
+            // set the owning side to null (unless already changed)
+            if ($stockMovimiento->getProducto() === $this) {
+                $stockMovimiento->setProducto(null);
+            }
+        }
 
         return $this;
     }
