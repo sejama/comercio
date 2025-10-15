@@ -4,9 +4,7 @@ namespace App\Enum;
 
 enum Tipo: string
 {
-    case VENTA = 'VENTA';
-    case COMPRA = 'COMPRA';
+    case ENTRADA = 'ENTRADA';
+    case SALIDA = 'SALIDA';
     case AJUSTE = 'AJUSTE';
-    case TRASLADO = 'TRASLADO';
-    case DEVOLUCION = 'DEVOLUCION';
 }

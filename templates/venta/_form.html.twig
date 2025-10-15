@@ -1,0 +1,61 @@
+{{ form_start(form) }}
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            {{ form_label(form.cliente, 'Cliente', { 'label_attr': { 'class': 'form-label' } }) }}
+            {{ form_widget(form.cliente, { 
+                'attr': { 
+                'class': 'form-select',
+                'required': true
+            }
+            }) }}
+            <div class="invalid-feedback">
+                Por favor seleccione un cliente.
+            </div>
+            {{ form_errors(form.cliente) }}
+        </div>
+        <div class="col-md-3 mb-3">
+            {{ form_label(form.estado, 'Estado', { 'label_attr': { 'class': 'form-label' } }) }}
+            {{ form_widget(form.estado, { 
+                'attr': { 
+                'class': 'form-control',
+                'required': true
+            }
+            }) }}
+            <div class="invalid-feedback">
+                Por favor ingrese un estado.
+            </div>
+            {{ form_errors(form.estado) }}
+        </div>
+        <div class="col-md-3 mb-3">
+            {{ form_label(form.formaPago, 'Forma de Pago', { 'label_attr': { 'class': 'form-label' } }) }}
+            {{ form_widget(form.formaPago, { 
+                'attr': { 
+                'class': 'form-control',
+                'required': true
+            }
+            }) }}
+            <div class="invalid-feedback">
+                Por favor ingrese una forma de pago.
+            </div>
+            {{ form_errors(form.formaPago) }}
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 mb-3">
+            {{ form_label(form.observacion, 'Observación', { 'label_attr': { 'class': 'form-label' } }) }}
+            {{ form_widget(form.observacion, { 
+                'type': 'textarea',
+                'attr': { 
+                'class': 'form-control',
+                'required': false,
+                'rows': 2
+            }
+            }) }}
+            <div class="invalid-feedback">
+                Por favor ingrese una observación.
+            </div>
+            {{ form_errors(form.observacion) }}
+        </div>
+    </div>
+    <button class="btn btn-primary btn-sm">{{ button_label|default('Crear') }}</button>
+{{ form_end(form) }}
