@@ -46,10 +46,17 @@ class Producto
     #[ORM\OneToMany(targetEntity: StockMovimiento::class, mappedBy: 'producto')]
     private Collection $stockMovimientos;
 
+    /**
+     * @var Collection<int, VentaDetalle>
+     */
+    #[ORM\OneToMany(mappedBy: 'producto', targetEntity: VentaDetalle::class, cascade: ['persist', 'remove'])]
+    private Collection $ventaDetalles;
+
     public function __construct()
     {
         $this->precioHistoricos = new ArrayCollection();
         $this->stockMovimientos = new ArrayCollection();
+        $this->ventaDetalles = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -183,6 +190,35 @@ class Producto
             // set the owning side to null (unless already changed)
             if ($stockMovimiento->getProducto() === $this) {
                 $stockMovimiento->setProducto(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, VentaDetalle>
+     */
+    public function getVentaDetalles(): Collection
+    {
+        return $this->ventaDetalles;
+    }
+
+    public function addVentaDetalle(VentaDetalle $ventaDetalle): static
+    {
+        if (!$this->ventaDetalles->contains($ventaDetalle)) {
+            $this->ventaDetalles->add($ventaDetalle);
+            $ventaDetalle->setProducto($this);
+        }
+
+        return $this;
+    }
+
+    public function removeVentaDetalle(VentaDetalle $ventaDetalle): static
+    {
+        if ($this->ventaDetalles->removeElement($ventaDetalle)) {
+            if ($ventaDetalle->getProducto() === $this) {
+                $ventaDetalle->setProducto(null);
             }
         }
 

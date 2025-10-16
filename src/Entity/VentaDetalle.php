@@ -16,7 +16,7 @@ class VentaDetalle
     #[ORM\ManyToOne(inversedBy: 'ventaDetalles')]
     private ?Venta $venta = null;
 
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne(inversedBy: 'ventaDetalles')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Producto $producto = null;
 

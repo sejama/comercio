@@ -14,8 +14,6 @@
                 <th>Estado</th>
                 <th>FormaPago</th>
                 <th>Observacion</th>
-                <th>CreatedAt</th>
-                <th>UpdatedAt</th>
                 <th>actions</th>
             </tr>
         </thead>
@@ -24,15 +22,12 @@
             <tr>
                 <td>{{ ventum.id }}</td>
                 <td>{{ ventum.fecha ? ventum.fecha|date('Y-m-d H:i:s') : '' }}</td>
-                <td>{{ ventum.total }}</td>
-                <td>{{ ventum.estado }}</td>
-                <td>{{ ventum.formaPago }}</td>
+                <td>${{ ventum.total }}</td>
+                <td>{{ ventum.estado.value }}</td>
+                <td>{{ ventum.formaPago.value }}</td>
                 <td>{{ ventum.observacion }}</td>
-                <td>{{ ventum.createdAt ? ventum.createdAt|date('Y-m-d H:i:s') : '' }}</td>
-                <td>{{ ventum.updatedAt ? ventum.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
                 <td>
-                    <a href="{{ path('app_venta_show', {'id': ventum.id}) }}">show</a>
-                    <a href="{{ path('app_venta_edit', {'id': ventum.id}) }}">edit</a>
+                    <a href="{{ path('app_venta_show', {'id': ventum.id}) }}">Ver</a>
                 </td>
             </tr>
         {% else %}

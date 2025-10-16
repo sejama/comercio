@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Venta;
+use App\Enum\VentaEstado;
 use App\Form\VentaType;
 use App\Repository\VentaRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -26,11 +27,25 @@ final class VentaController extends AbstractController
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $ventum = new Venta();
+        $ventum->setEstado(VentaEstado::PENDIENTE);
         $form = $this->createForm(VentaType::class, $ventum);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->persist($ventum);
+            $total = 0;
+            foreach ($ventum->getVentaDetalles() as $detalle) {
+                $detalle->setVenta($ventum);
+                $detalle->setPrecioUnitario($detalle->getProducto()->getPrecioActual());
+                $detalle->setSubtotal($detalle->getPrecioUnitario() * $detalle->getCantidad());
+                $entityManager->persist($detalle); // persist explícito si no hay cascade
+                $total += $detalle->getSubtotal();
+            }
+            $ventum->setTotal($total);
+
+            $entityManager->persist($ventum);
+
+
             $entityManager->flush();
 
             return $this->redirectToRoute('app_venta_index', [], Response::HTTP_SEE_OTHER);

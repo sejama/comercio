@@ -1,6 +1,6 @@
 {{ form_start(form) }}
     <div class="row">
-        <div class="col-md-6 mb-3">
+        <div class="col-md-9 mb-3">
             {{ form_label(form.cliente, 'Cliente', { 'label_attr': { 'class': 'form-label' } }) }}
             {{ form_widget(form.cliente, { 
                 'attr': { 
@@ -12,19 +12,6 @@
                 Por favor seleccione un cliente.
             </div>
             {{ form_errors(form.cliente) }}
-        </div>
-        <div class="col-md-3 mb-3">
-            {{ form_label(form.estado, 'Estado', { 'label_attr': { 'class': 'form-label' } }) }}
-            {{ form_widget(form.estado, { 
-                'attr': { 
-                'class': 'form-control',
-                'required': true
-            }
-            }) }}
-            <div class="invalid-feedback">
-                Por favor ingrese un estado.
-            </div>
-            {{ form_errors(form.estado) }}
         </div>
         <div class="col-md-3 mb-3">
             {{ form_label(form.formaPago, 'Forma de Pago', { 'label_attr': { 'class': 'form-label' } }) }}
@@ -57,5 +44,49 @@
             {{ form_errors(form.observacion) }}
         </div>
     </div>
+    {# --- Nuevo bloque para ventaDetalles dinámico --- #}
+    <div class="mb-3">
+        <label class="form-label">Detalles</label>
+
+        <div class="venta-detalles"
+             data-prototype="{{ form_widget(form.ventaDetalles.vars.prototype)|e('html_attr') }}">
+            {% for child in form.ventaDetalles %}
+                <div class="venta-detalle-item mb-2">
+                    {{ form_row(child) }}
+                    <button type="button" class="btn btn-danger btn-sm remove-item">Eliminar</button>
+                </div>
+            {% endfor %}
+        </div>
+
+        <button type="button" class="btn btn-secondary btn-sm mt-2" id="add-detalle">Agregar detalle</button>
+    </div>
+
     <button class="btn btn-primary btn-sm">{{ button_label|default('Crear') }}</button>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const container = document.querySelector('.venta-detalles');
+        if (!container) return;
+
+        const addBtn = document.getElementById('add-detalle');
+        let index = container.querySelectorAll('.venta-detalle-item').length;
+
+        addBtn.addEventListener('click', function () {
+            const prototype = container.dataset.prototype;
+            const newForm = prototype.replace(/__name__/g, index);
+            const wrapper = document.createElement('div');
+            wrapper.className = 'venta-detalle-item mb-2';
+            wrapper.innerHTML = newForm + '<button type="button" class="btn btn-danger btn-sm remove-item">Eliminar</button>';
+            container.appendChild(wrapper);
+            index++;
+        });
+
+        container.addEventListener('click', function (e) {
+            if (e.target && e.target.classList.contains('remove-item')) {
+                const item = e.target.closest('.venta-detalle-item');
+                if (item) item.remove();
+            }
+        });
+    });
+    </script>
 {{ form_end(form) }}
