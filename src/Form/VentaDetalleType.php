@@ -14,13 +14,25 @@ class VentaDetalleType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('cantidad')
             ->add('producto', EntityType::class, [
                 'class' => Producto::class,
                 'choice_label' => 'nombre',
+                'placeholder' => 'Seleccione un producto',
+                'choice_attr' => function (?Producto $producto, $key, $value) {
+                    if (!$producto) return [];
+                    return [
+                        'data-price' => $producto->getPrecioActual(), // o getPrecio()
+                        'data-min'   => 1,
+                    ];
+                },
             ])
-            ->add('precioUnitario')
-            ->add('subtotal')
+            ->add('cantidad', 
+                null, 
+                ['attr' => ['min' => 1, 'step' => 1]])
+            ->add('precioUnitario', null, 
+                ['attr' => ['readonly' => true]])
+            ->add('subtotal', null, 
+                ['attr' => ['readonly' => true]])
         ;
     }
 

@@ -1,4 +1,4 @@
-{{ form_start(form) }}
+{{ form_start(form, { 'attr': { 'class': 'needs-validation text-start', 'novalidate': true } }) }}
     <div class="row">
         <div class="col-md-9 mb-3">
             {{ form_label(form.cliente, 'Cliente', { 'label_attr': { 'class': 'form-label' } }) }}
@@ -44,16 +44,63 @@
             {{ form_errors(form.observacion) }}
         </div>
     </div>
-    {# --- Nuevo bloque para ventaDetalles dinámico --- #}
+    {# --- Nuevo bloque para ventaDetalles dinámico (cada detalle en una fila con botón eliminar en la misma fila) --- #}
+
+    {# Construyo el prototype como una fila Bootstrap; form.ventaDetalles.vars.prototype contiene __name__ en names/ids #}
+    {% set prototype_html %}
+        <div class="venta-detalle-item row g-2 align-items-center">
+            {% for sub in form.ventaDetalles.vars.prototype %}
+                {# Detecto el "tipo" del campo para añadir data-field (producto, cantidad, precio, subtotal, etc.) #}
+                {% set field_type = 'otro' %}
+                {% if sub.vars.name matches '/producto|producto_id|productoId|producto_/' %}
+                    {% set field_type = 'producto' %}
+                {% elseif sub.vars.name matches '/cantidad|qty|quantity|cant_/' %}
+                    {% set field_type = 'cantidad' %}
+                {% elseif sub.vars.name matches '/precio|unitario|precio_unitario|precioUnitario/' %}
+                    {% set field_type = 'precio' %}
+                {% elseif sub.vars.name matches '/subtotal|sub_total/' %}
+                    {% set field_type = 'subtotal' %}
+                {% endif %}
+
+                <div class="col mb-3">
+                    {{ form_label(sub, null, {'label_attr': {'class': 'form-label'}}) }}
+                    {{ form_widget(sub, {'attr': {'class': 'form-control', 'data-field': field_type}}) }}
+                </div>
+            {% endfor %}
+            <div class="col-auto  mt-4">
+                <button type="button" class="btn btn-danger btn-sm remove-item">Eliminar</button>
+            </div>
+        </div>
+    {% endset %}
+
     <div class="mb-3">
-        <label class="form-label">Detalles</label>
+        <p class="form-label text-center"><strong>Detalles</strong></p>
 
         <div class="venta-detalles"
-             data-prototype="{{ form_widget(form.ventaDetalles.vars.prototype)|e('html_attr') }}">
+            data-prototype="{{ prototype_html|e('html_attr') }}">
             {% for child in form.ventaDetalles %}
-                <div class="venta-detalle-item mb-2">
-                    {{ form_row(child) }}
-                    <button type="button" class="btn btn-danger btn-sm remove-item">Eliminar</button>
+                <div class="venta-detalle-item row g-2 align-items-center">
+                    {% for sub in child %}
+                        {# Igual detección para los elementos ya renderizados #}
+                        {% set field_type = 'otro' %}
+                        {% if sub.vars.name matches '/producto|producto_id|productoId|producto_/' %}
+                            {% set field_type = 'producto' %}
+                        {% elseif sub.vars.name matches '/cantidad|qty|quantity|cant_/' %}
+                            {% set field_type = 'cantidad' %}
+                        {% elseif sub.vars.name matches '/precio|unitario|precio_unitario|precioUnitario/' %}
+                            {% set field_type = 'precio' %}
+                        {% elseif sub.vars.name matches '/subtotal|sub_total/' %}
+                            {% set field_type = 'subtotal' %}
+                        {% endif %}
+
+                        <div class="col mb-3">
+                            {{ form_label(sub, null, {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(sub, {'attr': {'class': 'form-control', 'data-field': field_type}}) }}
+                        </div>
+                    {% endfor %}
+                    <div class="col-auto mt-4">
+                        <button type="button" class="btn btn-danger btn-sm remove-item">Eliminar</button>
+                    </div>
                 </div>
             {% endfor %}
         </div>
@@ -71,13 +118,74 @@
         const addBtn = document.getElementById('add-detalle');
         let index = container.querySelectorAll('.venta-detalle-item').length;
 
+        function fmt(num) {
+            const n = parseFloat(num);
+            if (isNaN(n)) return '0.00';
+            return n.toFixed(2);
+        }
+
+        function updateSubtotal(row) {
+            const qtyEl = row.querySelector('[data-field="cantidad"]');
+            const priceEl = row.querySelector('[data-field="precio"], [data-field="precioUnitario"]');
+            const subEl = row.querySelector('[data-field="subtotal"]');
+
+            const qty = qtyEl ? parseFloat(qtyEl.value || 0) : 0;
+            const price = priceEl ? parseFloat(priceEl.value || 0) : 0;
+            const subtotal = qty * price;
+
+            if (subEl) {
+                if (subEl.tagName.toLowerCase() === 'input' || subEl.tagName.toLowerCase() === 'textarea') {
+                    subEl.value = fmt(subtotal);
+                } else {
+                    subEl.textContent = fmt(subtotal);
+                }
+            }
+        }
+
+        function initRow(row) {
+            if (!row) return;
+            const producto = row.querySelector('[data-field="producto"]');
+            const qty = row.querySelector('[data-field="cantidad"]');
+            const price = row.querySelector('[data-field="precio"], [data-field="precioUnitario"]');
+
+            if (producto) {
+                producto.addEventListener('change', function () {
+                    const opt = producto.options[producto.selectedIndex];
+
+                    if (!opt) return;
+                    const min = opt.dataset.min;
+                    const priceOpt = opt.dataset.price || opt.dataset.precio;
+
+                    if (min !== undefined && min !== '' && qty) {
+                        qty.value = min;
+                    }
+
+                    if (priceOpt !== undefined && price && priceOpt !== '') {
+                        const parsed = parseFloat(priceOpt);
+                        price.value = isNaN(parsed) ? priceOpt : fmt(parsed);
+                        // disparar input para que cualquier listener reaccione (y para recalcular)
+                        price.dispatchEvent(new Event('input', { bubbles: true }));
+                    }
+
+                    updateSubtotal(row);
+                });
+            }
+
+            if (qty) qty.addEventListener('input', function () { updateSubtotal(row); });
+            if (price) price.addEventListener('input', function () { updateSubtotal(row); });
+
+            updateSubtotal(row);
+        }
+
+        container.querySelectorAll('.venta-detalle-item').forEach(initRow);
+
         addBtn.addEventListener('click', function () {
             const prototype = container.dataset.prototype;
             const newForm = prototype.replace(/__name__/g, index);
-            const wrapper = document.createElement('div');
-            wrapper.className = 'venta-detalle-item mb-2';
-            wrapper.innerHTML = newForm + '<button type="button" class="btn btn-danger btn-sm remove-item">Eliminar</button>';
-            container.appendChild(wrapper);
+            container.insertAdjacentHTML('beforeend', newForm);
+            const items = container.querySelectorAll('.venta-detalle-item');
+            const newItem = items[items.length - 1];
+            initRow(newItem);
             index++;
         });
 

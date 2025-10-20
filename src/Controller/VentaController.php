@@ -72,6 +72,11 @@ final class VentaController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $total = 0;
+            foreach ($ventum->getVentaDetalles() as $detalle) {
+                $total += $detalle->getSubtotal();
+            }
+            $ventum->setTotal($total);
             $entityManager->flush();
 
             return $this->redirectToRoute('app_venta_index', [], Response::HTTP_SEE_OTHER);
@@ -87,6 +92,9 @@ final class VentaController extends AbstractController
     public function delete(Request $request, Venta $ventum, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete'.$ventum->getId(), $request->getPayload()->getString('_token'))) {
+            foreach ($ventum->getVentaDetalles() as $detalle) {
+                $entityManager->remove($detalle);
+            }
             $entityManager->remove($ventum);
             $entityManager->flush();
         }

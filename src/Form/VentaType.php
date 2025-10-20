@@ -34,6 +34,7 @@ class VentaType extends AbstractType
                 'by_reference' => false,
                 'prototype' => true,
                 'entry_options' => ['label' => true],
+                'label' => false
             ])
         ;
     }

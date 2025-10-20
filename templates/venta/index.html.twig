@@ -1,10 +1,18 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Venta index{% endblock %}
-
 {% block body %}
-    <h1>Venta index</h1>
-
+    <h1>{% block title %}Venta{% endblock %}</h1>
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success" role="alert">
+            {{ message }}
+        </div>
+    {% endfor %}
+    {% for message in app.flashes('error') %}
+        <div class="alert alert-danger" role="alert">
+            {{ message }}
+        </div>
+    {% endfor %}
+    <a href="{{ path('app_venta_new') }}" class="btn btn-success mb-3">Crear nueva venta</a>
     <table class="table">
         <thead>
             <tr>
@@ -27,7 +35,7 @@
                 <td>{{ ventum.formaPago.value }}</td>
                 <td>{{ ventum.observacion }}</td>
                 <td>
-                    <a href="{{ path('app_venta_show', {'id': ventum.id}) }}">Ver</a>
+                    <a href="{{ path('app_venta_show', {'id': ventum.id}) }}" class="btn btn-primary btn-sm">Ver</a>
                 </td>
             </tr>
         {% else %}
@@ -37,6 +45,4 @@
         {% endfor %}
         </tbody>
     </table>
-
-    <a href="{{ path('app_venta_new') }}">Create new</a>
 {% endblock %}
