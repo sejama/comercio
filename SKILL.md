@@ -1,20 +1,33 @@
 # Skill Symfony para `src/comercio`
 
-## Contexto
+## Contexto y Configuración
 
-- Proyecto Symfony ubicado en `src/comercio`.
-- La carpeta se monta en Docker en `/var/www/html/comercio`.
-- El contenedor principal es `server-php-apache`.
-- Usa `composer install --working-dir /var/www/html/comercio` y `php /var/www/html/comercio/bin/console`.
+- **Ubicación local**: `src/comercio` | **Ubicación en contenedor**: `/var/www/html/comercio`
+- **Servicio Docker**: `server-php-apache`
+- **Acceso HTTP**: http://localhost:8080/comercio/public/
+- **Ruta de Comandos**: `php /var/www/html/comercio/bin/console`
 
-## Reglas específicas
+## Reglas Específicas del Subproyecto
 
-- Identifica la configuración propia de este proyecto en `src/comercio/.env` y `src/comercio/.env.local`.
-- Para ejecutar tareas de Symfony usa la ruta completa del proyecto.
-- Para correr PHPUnit usa `php /var/www/html/comercio/vendor/bin/phpunit` si está instalado.
+1. **Gestión de Dependencias y Caché**:
+   ```bash
+   docker compose exec server-php-apache composer install --working-dir /var/www/html/comercio
+   docker compose exec server-php-apache php /var/www/html/comercio/bin/console cache:clear
+   ```
+2. **Frontend & AssetMapper**:
+   - Este subproyecto utiliza **Symfony AssetMapper** (`importmap.php` y directorio `assets/`).
+   - Para añadir/actualizar librerías JavaScript sin Node.js en build:
+     ```bash
+     docker compose exec server-php-apache php /var/www/html/comercio/bin/console importmap:require <paquete>
+     ```
+3. **Pruebas Automatizadas**:
+   ```bash
+   docker compose exec server-php-apache php /var/www/html/comercio/vendor/bin/phpunit
+   ```
 
-## Buenas prácticas
+## Mejores Prácticas de Desarrollo (Comercio Electrónico)
 
-- Mantén los cambios de configuración dentro de `src/comercio`.
-- Si el proyecto usa `importmap.php`, asegúrate de no romper la infraestructura de frontend del subproyecto.
-- Prioriza el uso de `docker compose exec server-php-apache bash` para correr comandos con el contexto correcto.
+- **Integridad Transaccional**: Para operaciones de checkout, cambios de estado de pedidos o actualización de stock, encapsular la lógica en transacciones de Doctrine (`$em->wrapInTransaction()`).
+- **Separación de Lógica en Servicios**: La lógica de carrito, pasarelas de pago y cálculo de totales debe residir en servicios/managers dedicados dentro de `src/Service/` o `src/Manager/`, no en los controladores.
+- **Gestión de Assets**: Modificar únicamente `importmap.php` o `assets/app.js` mediante la consola de Symfony AssetMapper para asegurar la compatibilidad en despliegue.
+- **Migraciones de Base de Datos**: Ejecutar siempre `doctrine:migrations:migrate` al actualizar la estructura de catálogos u órdenes.
